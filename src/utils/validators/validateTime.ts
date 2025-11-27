@@ -1,0 +1,1 @@
+export const validateTimeRegex = /^\d{2}:\d{2}$/

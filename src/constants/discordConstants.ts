@@ -1,0 +1,1 @@
+export const MAX_DISCORD_CHOICES = 25;

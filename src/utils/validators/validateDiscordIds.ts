@@ -1,0 +1,1 @@
+export const discordIdRegex = /^[0-9]{16,25}$/

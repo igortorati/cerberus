@@ -1,0 +1,16 @@
+name = "cerberus"
+main = "./src/server.ts"
+compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2025-02-04"
+[observability.logs]
+enabled = true
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "8a5bcbd071d448d2b007fdf0f21b8cbe"
+localConnectionString = "mysql://root:root@localhost:3306/cerberus_test"
+
+# [secrets]
+# DISCORD_TOKEN
+# DISCORD_PUBLIC_KEY
+# DISCORD_APPLICATION_ID

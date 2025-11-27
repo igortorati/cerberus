@@ -1,0 +1,16 @@
+export const FIELD_LABELS: Record<string, string> = {
+  name: '🎲 Mesa',
+  dm_discord_id: '🧙 Mestre',
+  day_of_week: '📅 Dia',
+  time: '🕒 Horário',
+  max_players: '👥 Vagas',
+  current_players: '👥 Vagas Preenchidas',
+  max_staff_players: ':medical_symbol: Vagas Staff',
+  current_staff_players: ':medical_symbol: Vagas Preenchidas Staff',
+  price: '💰 Valor',
+  frequency: '🔁 Frequência',
+  start_date: '🗓️ Primeira Sessão',
+  text_channel_id: '💬 Canal Texto',
+  voice_channel_id: '🎧 Canal Voz',
+  role_id: '🏷️ Cargo',
+};

@@ -1,0 +1,13 @@
+const DAYS_OF_WEEK_OPTION_NAME = 'dia_da_semana'
+const FREQUENCY_OPTION_NAME = 'frequencia'
+const TABLE_OPTION_NAME = 'mesa'
+const ORIGIN_OPTION_NAME = 'origem'
+const JOIN_ORIGIN_OPTION_NAME = 'origem_entrada'
+
+export {
+  DAYS_OF_WEEK_OPTION_NAME,
+  FREQUENCY_OPTION_NAME,
+  TABLE_OPTION_NAME,
+  ORIGIN_OPTION_NAME,
+  JOIN_ORIGIN_OPTION_NAME,
+}
