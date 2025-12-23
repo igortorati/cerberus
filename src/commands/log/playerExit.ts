@@ -1,6 +1,6 @@
 import { InteractionResponseType } from 'discord-interactions';
 import { JsonResponse } from '../../utils/jsonResponse';
-import { APIChatInputApplicationCommandInteraction } from 'discord-api-types/v10';
+import { APIChatInputApplicationCommandInteraction, PermissionFlagsBits } from 'discord-api-types/v10';
 import { extractInteractionData } from '../../utils/getInteractionOptions';
 import { EmbedBuilder } from '../../utils/embedBuilder';
 import { Env } from '../../interfaces/envInterface';
@@ -15,6 +15,7 @@ import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFo
 import { WarningMessage } from '../../interfaces/warningInterface';
 import { PlayerEntryInputData } from '../../interfaces/playerEntryInputDataInterface';
 import { NewPlayerEntryLog } from '../../models/playerEntryLogModel';
+import { hasPermission } from '../../utils/hasPermission';
 
 export async function playerExit(
   transaction: DBTransaction,
@@ -24,7 +25,7 @@ export async function playerExit(
   const inputData = extractInteractionData<PlayerEntryInputData>(interaction)
   const newPlayerData = getPlayerEntryFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
 
-  const { game, currentPlayer } = await validateInput(transaction, newPlayerData);
+  const { game, currentPlayer } = await validateInput(transaction, newPlayerData, interaction);
 
   const logService = new PlayerEntryLogService();
   const logId = await logService.createLog(transaction, newPlayerData);
@@ -53,7 +54,7 @@ function getPlayerEntryFromPlayerEntryInputData(entry: PlayerEntryInputData, id:
   } as NewPlayerEntryLog
 }
 
-async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntryLog) {
+async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntryLog, interaction: APIChatInputApplicationCommandInteraction) {
   if (!exitData.player_discord_id || !exitData.game_id) {
     throw new CommandError("⚠️ Por favor, informe **jogador** e **mesa**.");
   }
@@ -62,6 +63,10 @@ async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntr
   const currentPlayerService = new CurrentPlayerService();
 
   const game = await gameService.getGameById(transaction, exitData.game_id);
+
+  if (game.dm_discord_id !== interaction.member?.user.id && hasPermission(interaction.member?.permissions, PermissionFlagsBits.ManageRoles) === false) {
+    throw new CommandError(`❌ Você não é o Mestre da Mesa "${game.name}"!`);
+  }
 
   const currentPlayer = await currentPlayerService.getEntryByTableAndUser(transaction, exitData.player_discord_id, exitData.game_id);
   if (!currentPlayer) {
