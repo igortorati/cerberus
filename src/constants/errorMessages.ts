@@ -1,19 +1,16 @@
 import { DAY_OF_WEEK } from "../enums/daysOfWeek"
 import { FREQUENCY } from "../enums/frequency"
-import { SESSION_TYPE } from "../enums/sessionType"
 
 export const ERROR_DURING_TABLE_CREATION = 'Ocorreu um erro ao criar a mesa.'
 export const ERROR_DURING_TABLE_RETRIEVAL = 'Ocorreu um erro ao recuperar a mesa.'
 export const ERROR_DURING_TABLE_UPDATE = 'Ocorreu um erro ao atualizar a mesa.'
 export const ERROR_DURING_TABLE_DELETION = 'Ocorreu um erro ao deletar a mesa.'
 export const ERROR_TABLE_NOT_FOUND = 'Mesa não encontrada ou inativa.'
-export const ERROR_SESSION_ALREADY_SCHEDULED = 'Sessão já está agendada para essa mesa nessa data.'
 export const ERROR_ORIGIN_NOT_FOUND = 'A Origem selecionada não foi encontrada.'
 
 
 
 export const INVALID_ID_MESSAGE = 'ID da mesa inválido.'
-export const INVALID_SESSION_TYPE = `Tipo de agendamento invalido, deve seguir o formato adequado (${Object.values(SESSION_TYPE).join(", ")}).`
 export const INVALID_REASON_TOO_LONG = 'O motivo deve ter no máximo 150 caracteres.'
 export const INVALID_DATE_FORMAT = 'Formato de data de início inválido. Use dd/mm/aaaa e insira uma data válida.'
 export const INVALID_TIME_FORMAT = 'Formato de horário inválido. Use HH:mm.'

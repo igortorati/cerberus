@@ -49,7 +49,7 @@ export class GameRepository {
       )
     `
 
-    let condition: any;
+    let condition;
 
     if (searchTerm !== '') {
       condition = sql`LOWER(${fullTableNameString}) LIKE ${'%' + searchTerm + '%'}`

@@ -1,6 +1,6 @@
 import { WarningMessage } from "../interfaces/warningInterface"
 
-export async function addRoleToUser(guildId: string, roleId: string, discordUserId: string, discordToken: string): Promise<WarningMessage> {
+export async function addRoleToUser(guildId: string | undefined, roleId: string, discordUserId: string, discordToken: string): Promise<WarningMessage> {
   if (roleId && discordUserId) {
     const response = await fetch(
       `https://discord.com/api/v10/guilds/${guildId}/members/${discordUserId}/roles/${roleId}`,

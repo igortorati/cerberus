@@ -20,4 +20,9 @@ export default defineConfig([
     },
   },
   ...tseslint.configs.recommended,
+  {
+    rules: {
+      "no-unused-vars": "error",
+    }
+  }
 ]);

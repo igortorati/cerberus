@@ -10,6 +10,10 @@ import { Env } from '../../interfaces/envInterface'
 import { buildEditGameDataFromCreateGameInteraction } from '../../utils/buildEditGameDataFromEditGameInteraction'
 import { NewGame } from '../../models'
 import { FIELD_LABELS } from '../../constants/fieldLabelsConstants'
+import { addRoleToUser } from '../../utils/addRoleToUser'
+import { CurrentPlayerService } from '../../services/currentPlayerService'
+import { removeRoleFromUser } from '../../utils/removeRoleFromUser'
+import { WarningMessage } from '../../interfaces/warningInterface'
 
 export async function editTable(
   transaction: DBTransaction,
@@ -19,6 +23,9 @@ export async function editTable(
   const discordUserService = new DiscordUserService()
   const gameService = new GameService()
   const updateData = buildEditGameDataFromCreateGameInteraction(interaction)
+  const currentPlayerService = new CurrentPlayerService()
+  let addedRoleWarning;
+  let removedRoleWarning;
 
   if (updateData.dm_discord_id)
     await discordUserService.createOrUpdateUser(
@@ -30,9 +37,24 @@ export async function editTable(
 
   const oldTable = await gameService.getGameById(transaction, updateData.id)
   await gameService.updateGame(transaction, updateData.id, updateData)
+  
+  const currentPlayers = await currentPlayerService.getByGame(transaction, updateData.id)
+  if (updateData.role_id && oldTable.current_players > 0) {
+    for(const player of currentPlayers) {
+      const addedRoleReturn = await addRoleToUser(interaction.guild_id, updateData.role_id, player.discord_player_id, env.DISCORD_TOKEN)
+      const removedRoleReturn = await removeRoleFromUser(interaction.guild_id, oldTable.role_id, player.discord_player_id, env.DISCORD_TOKEN)
+      if(addedRoleReturn.hasWarning) {
+        addedRoleWarning = addedRoleReturn
+      }
+      if(removedRoleReturn.hasWarning) {
+        removedRoleWarning = removedRoleReturn
+      }
+    }
+  }
+
   const updatedTable = await gameService.getGameById(transaction, updateData.id)
 
-  const embed = buildUpdateEmbed(oldTable, updatedTable, updateData.id)
+  const embed = buildUpdateEmbed(oldTable, updatedTable, updateData.id, addedRoleWarning, removedRoleWarning, currentPlayers)
   return new JsonResponse({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: { embeds: [embed] },
@@ -40,10 +62,7 @@ export async function editTable(
 }
 
 function buildUpdateEmbed(
-  oldTable: Partial<NewGame>,
-  updatedTable: Partial<NewGame>,
-  gameId: number
-) {
+oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, addedRoleWarning: WarningMessage | undefined, removedRoleWarning: WarningMessage | undefined, currentPlayers: { id: number; game_id: number; discord_player_id: string; is_staff: boolean} []) {
   const updatedFields = (Object.entries(FIELD_LABELS) as Array<
     [keyof NewGame, string]
   >)
@@ -74,8 +93,23 @@ function buildUpdateEmbed(
     })
   }
 
+  if (oldTable.role_id !== updatedTable.role_id) {
+    const playersString = currentPlayers.map(player => `<@${player.discord_player_id}>`).join(', ')
+    if (removedRoleWarning && removedRoleWarning.hasWarning && removedRoleWarning.warningMessage) {
+      updatedFields.push({ name: '❗❗ Aviso', value: `Falha ao remover a role anterior <@&${oldTable.role_id}> dos jogadores: ${playersString}. **A operação deve ser feita manualmente**.`, inline: false})
+    } else {
+      updatedFields.push({ name: 'Roles removidas', value: 'A role anterior foi removida dos seguintes jogadores: ' + playersString, inline: false})
+    }
+
+    if (addedRoleWarning && addedRoleWarning.hasWarning && addedRoleWarning.warningMessage) {
+      updatedFields.push({ name: '❗❗ Aviso', value: `Falha ao adicionar a nova role <@&${updatedTable.role_id}> aos jogadores: ${playersString}. **A operação deve ser feita manualmente**.`, inline: false})
+    } else {
+      updatedFields.push({ name: 'Roles adicionadas', value: 'A nova role foi adicionada aos seguintes jogadores: ' + playersString, inline: false})
+    }
+  }
+
   return EmbedBuilder({
-    title: '✏️ Mesa Atualizada!',
+    title: ' ✏️ Mesa Atualizada!',
     fields: updatedFields,
     footer: { text: `🆔 ID da Mesa: ${gameId}` },
   })

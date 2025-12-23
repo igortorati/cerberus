@@ -13,8 +13,6 @@ import {
   CREATE_JOIN_ORIGIN_COMMAND,
   PLAYER_ENTRY_COMMAND,
   PLAYER_LEAVE_COMMAND,
-  SCHEDULE_SESSION_COMMAND,
-  UNSCHEDULE_SESSION_COMMAND,
 } from '../discord/commandsMetadata'
 import type { Env } from '../interfaces/envInterface'
 import { createTable } from '../commands/table/createTable'
@@ -31,8 +29,6 @@ import { initDB } from '../database/db'
 import { JsonResponse } from '../utils/jsonResponse'
 import { InteractionResponseType } from 'discord-interactions'
 import { CommandError } from '../errors/commandError'
-import { scheduleSession } from '../commands/sessions/scheduleSession'
-import { unscheduleSession } from '../commands/sessions/unscheduleSession'
 
 export async function handleInteraction(
   interaction: APIInteraction,
@@ -75,12 +71,6 @@ export async function handleInteraction(
 
             case PLAYER_LEAVE_COMMAND.name.toLowerCase():
               return await playerExit(tx, commandInteraction, env)
-
-            case SCHEDULE_SESSION_COMMAND.name.toLowerCase():
-              return await scheduleSession(tx, commandInteraction, env)
-
-            case UNSCHEDULE_SESSION_COMMAND.name.toLowerCase():
-              return await unscheduleSession(tx, commandInteraction, env)
 
             default:
               throw new CommandError('Comando desconhecido.')

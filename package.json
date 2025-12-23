@@ -19,6 +19,7 @@
     "discord.js": "^14.23.2",
     "drizzle-orm": "^0.44.7",
     "itty-router": "^5.0.22",
+    "jiti": "^2.6.1",
     "moment": "^2.30.1",
     "mysql2": "^3.15.3"
   },

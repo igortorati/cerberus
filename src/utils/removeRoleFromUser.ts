@@ -1,7 +1,7 @@
 import { WarningMessage } from "../interfaces/warningInterface"
 
 export async function removeRoleFromUser(
-  guildId: string,
+  guildId: string | undefined,
   roleId: string,
   discordUserId: string,
   discordToken: string
