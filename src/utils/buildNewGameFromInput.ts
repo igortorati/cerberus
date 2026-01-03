@@ -39,6 +39,7 @@ export function buildNewGameDataFromCreateGameInteraction(
     is_active: true,
     generate_calendar: true,
     created_by_discord_id: createdByUser ?? null,
+    is_one_shot: !isNull(data.one_shot) ? data.one_shot : false
   }
 
   return newGameData

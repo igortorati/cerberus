@@ -9,5 +9,6 @@ export function mapFechedDiscordUserToNewDiscordUser (fetchedDiscordUser: APIGui
     id: fetchedDiscordUser.user.id,
     global_name: fetchedDiscordUser.user.global_name || fetchedDiscordUser.user.username,
     server_nick: fetchedDiscordUser.nick,
+    username: fetchedDiscordUser.user.username,
   }
 }

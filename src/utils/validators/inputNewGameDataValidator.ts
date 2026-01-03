@@ -66,6 +66,11 @@ export const inputGameDataValidator = z.object({
       if (!parsed) throw new CommandError(INVALID_DATE_FORMAT)
       return parsed
     }),
+
+  one_shot: z
+    .boolean()
+    .optional()
+    .default(false),
 })
 
 export type ValidatedNewGameInput = z.infer<typeof inputGameDataValidator>

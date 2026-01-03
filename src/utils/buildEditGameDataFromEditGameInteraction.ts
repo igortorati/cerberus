@@ -32,6 +32,7 @@ export function buildEditGameDataFromCreateGameInteraction(
     time: data.horario,
     price: data.valor?.toString(),
     start_date: data.data_primeira_sessao,
+    is_one_shot: data.one_shot
   }
 
   return editGameData

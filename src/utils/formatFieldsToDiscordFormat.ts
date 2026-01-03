@@ -27,6 +27,9 @@ export function formatFieldsToDiscordFormat(
     case 'price':
       return `R$${val}`
 
+    case 'is_one_shot':
+      return val ? "Sim" : "Não" 
+
     case 'max_players':
     case 'max_staff_players':
     default:

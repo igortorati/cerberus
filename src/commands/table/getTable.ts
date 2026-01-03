@@ -26,12 +26,11 @@ export async function getTable(
   const embeds = [tableEmbed]
   if(retrievedGame.current_players > 0) {
     const currentPlayers = await currentPlayerService.getByGame(transaction, gameId)
-    console.log("currentPlayers", currentPlayers)
     const playerFields = currentPlayers.map((entry) => {
       return {
         name: `Jogador${entry.is_staff ? " (Staff)" : ""}`,
         value: `<@${entry.discord_player_id}>${entry.is_staff ? " ⭐" : ""}`,
-        inline: true,
+        inline: false,
       }
     })
     embeds.push(EmbedBuilder({

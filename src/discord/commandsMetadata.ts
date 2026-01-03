@@ -90,6 +90,12 @@ export const CREATE_TABLE_COMMAND = {
       description: 'Número total de vagas disponíveis para Staff.',
       min_value: 0,
     },
+    {
+      type: 5,
+      name: 'one_shot',
+      description: 'Marque se esta é uma One shot.',
+      required: false,
+    },
   ],
 }
 
@@ -175,6 +181,12 @@ export const EDIT_TABLE_COMMAND = {
       name: 'vagas_staff',
       description: 'Número total de vagas disponíveis para Staff.',
       min_value: 0,
+    },
+    {
+      type: 5,
+      name: 'one_shot',
+      description: 'Marque se esta é uma One shot.',
+      required: false,
     },
   ],
 }

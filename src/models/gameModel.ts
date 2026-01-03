@@ -50,6 +50,8 @@ export const game = mysqlTable('game', {
   generate_calendar: boolean('generate_calendar').default(true),
 
   created_by_discord_id: varchar('created_by_discord_id', { length: 25 }),
+
+  is_one_shot: boolean('is_one_shot').notNull(),
 })
 
 export const gameRelations = relations(game, ({ one, many }) => ({

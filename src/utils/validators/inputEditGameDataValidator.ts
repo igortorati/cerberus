@@ -84,6 +84,11 @@ export const inputEditGameDataValidator = z.object({
       return parsed
     })
     .optional(),
+
+  one_shot: z
+    .boolean()
+    .optional()
+    .default(false),
 })
 
 export type ValidatedEditGameInput = z.infer<typeof inputEditGameDataValidator>

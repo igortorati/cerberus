@@ -11,4 +11,5 @@ export interface INewGameInputData {
   horario: string;
   valor: number;
   data_primeira_sessao: string;
+  is_one_shot: boolean;
 }

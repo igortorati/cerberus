@@ -27,20 +27,77 @@ export class GameRepository {
     transaction: DBTransaction,
     search?: string
   ): Promise<{ name: string; value: string }[]> {
+
     const searchTerm = search?.trim().toLowerCase() || ''
 
-    const fullTableNameString = sql<string>`
+    const dmName = sql<string>`
+      CASE
+        WHEN CHAR_LENGTH(
+          COALESCE(
+            ${discordUser.server_nick},
+            ${discordUser.global_name},
+            ${discordUser.username},
+            'Desconhecido'
+          )
+        ) > 18
+        THEN CONCAT(
+          LEFT(
+            COALESCE(
+              ${discordUser.server_nick},
+              ${discordUser.global_name},
+              ${discordUser.username},
+              'Desconhecido'
+            ),
+            15
+          ),
+          '...'
+        )
+        ELSE COALESCE(
+          ${discordUser.server_nick},
+          ${discordUser.global_name},
+          ${discordUser.username},
+          'Desconhecido'
+        )
+      END
+    `
+
+    const tableName = sql<string>`
+      CASE
+        WHEN CHAR_LENGTH(${game.name}) >
+          (
+            100
+            - 31
+            - CHAR_LENGTH(${dmName})
+          )
+        THEN CONCAT(
+          LEFT(
+            ${game.name},
+            (
+              100
+              - 31
+              - CHAR_LENGTH(${dmName})
+            )
+          ),
+          '...'
+        )
+        ELSE ${game.name}
+      END
+    `
+
+    const displayName = sql<string>`
       CONCAT(
         CASE
           WHEN ${game.is_active} = false THEN '❌'
           WHEN ${game.current_players} >= ${game.max_players} THEN '🟡'
-          WHEN ${game.current_players} < ${game.max_players} AND ${game.current_staff_players} < ${game.max_staff_players} THEN '🟢⭐'
+          WHEN ${game.current_players} < ${game.max_players}
+          AND ${game.current_staff_players} < ${game.max_staff_players}
+          THEN '🟢⭐'
           ELSE '🟢'
         END,
         ' ',
-        ${game.name},
+        ${tableName},
         ' (',
-        COALESCE(${discordUser.server_nick}, ${discordUser.global_name}, 'Desconhecido'),
+        ${dmName},
         ' - ',
         COALESCE(${game.day_of_week}, 'Dia indefinido'),
         ' ',
@@ -49,16 +106,42 @@ export class GameRepository {
       )
     `
 
-    let condition;
+    const searchString = sql<string>`
+      CONCAT(
+        CASE
+          WHEN ${game.is_active} = false THEN '❌'
+          WHEN ${game.current_players} >= ${game.max_players} THEN '🟡'
+          WHEN ${game.current_players} < ${game.max_players}
+          AND ${game.current_staff_players} < ${game.max_staff_players}
+          THEN '🟢⭐'
+          ELSE '🟢'
+        END,
+        ' ',
+        ${game.name},
+        ' (',
+        COALESCE(
+          ${discordUser.server_nick},
+          ${discordUser.global_name},
+          ${discordUser.username},
+          'Desconhecido'
+        ),
+        ' - ',
+        COALESCE(${game.day_of_week}, 'Dia indefinido'),
+        ' ',
+        COALESCE(DATE_FORMAT(${game.time}, '%H:%i'), 'Hora indefinida'),
+        ')'
+      )
+    `
 
+    let condition
     if (searchTerm !== '') {
-      condition = sql`LOWER(${fullTableNameString}) LIKE ${'%' + searchTerm + '%'}`
+      condition = sql`LOWER(${searchString}) LIKE ${'%' + searchTerm + '%'}`
     }
 
     const results = await transaction
       .select({
         id: game.id,
-        name: fullTableNameString.as('name'),
+        name: displayName.as('name'),
       })
       .from(game)
       .leftJoin(discordUser, eq(game.dm_discord_id, discordUser.id))
