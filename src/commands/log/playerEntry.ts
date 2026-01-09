@@ -52,7 +52,7 @@ export async function playerEntry(
 function getPlayerEntryFromPlayerEntryInputData(entry: PlayerEntryInputData, id: string): NewPlayerEntryLog {
   return {
     reported_by_discord_id: id,
-    player_discord_id: entry.jogador,
+    discord_player_id: entry.jogador,
     operation: "entry",
     game_id: entry.mesa,
     is_staff_player: entry.vaga_staff,
@@ -87,24 +87,24 @@ async function addPlayer(
   
   const currentPlayer = new CurrentPlayerService();
   const discordUserService = new DiscordUserService();
-  const checkUserAlreadyOnTable = await currentPlayer.getEntryByTableAndUser(transaction, playerEntry.player_discord_id, game.id)
-  if(checkUserAlreadyOnTable) throw new CommandError(`O jogador <@${playerEntry.player_discord_id}> já está na mesa selecionada.`)
+  const checkUserAlreadyOnTable = await currentPlayer.getEntryByTableAndUser(transaction, playerEntry.discord_player_id, game.id)
+  if(checkUserAlreadyOnTable) throw new CommandError(`O jogador <@${playerEntry.discord_player_id}> já está na mesa selecionada.`)
 
   const newCurrentPlayer: NewCurrentPlayer = {
     game_id: playerEntry.game_id,
-    discord_player_id: playerEntry.player_discord_id,
-    is_staff: playerEntry.is_staff_player,
+    discord_player_id: playerEntry.discord_player_id,
+    is_staff_player: playerEntry.is_staff_player,
   }
 
-  await discordUserService.createOrUpdateUser(transaction, playerEntry.player_discord_id, interaction.guild_id, env)
+  await discordUserService.createOrUpdateUser(transaction, playerEntry.discord_player_id, interaction.guild_id, env)
   await currentPlayer.addPlayer(transaction, newCurrentPlayer)
 
   if(!interaction.guild_id) throw new CommandError(`Não foi possível encontrar a Guild`)
-  return await addRoleToUser(interaction.guild_id, game.role_id, playerEntry.player_discord_id, env.DISCORD_TOKEN)
+  return await addRoleToUser(interaction.guild_id, game.role_id, playerEntry.discord_player_id, env.DISCORD_TOKEN)
 }
 
 function validateInput(newPlayerEntry: NewPlayerEntryLog, game: Game) {
-  if (isNull(newPlayerEntry.player_discord_id) || isNull(newPlayerEntry.game_id) || isNull(newPlayerEntry.join_from_id)) {
+  if (isNull(newPlayerEntry.discord_player_id) || isNull(newPlayerEntry.game_id) || isNull(newPlayerEntry.join_from_id)) {
     throw new CommandError("⚠️ Por favor, informe **jogador**, **mesa** e **origem**.")
   }
 
@@ -115,7 +115,7 @@ function validateInput(newPlayerEntry: NewPlayerEntryLog, game: Game) {
 
 function createEmbed(warning: WarningMessage, game: Game, origin: JoinOrigin, playerEntry: NewPlayerEntryLog, logId: number) {
   const fields = [
-      { name: '👤 Jogador', value: formatFieldsToDiscordFormat(playerEntry.player_discord_id, "discordUser"), inline: true },
+      { name: '👤 Jogador', value: formatFieldsToDiscordFormat(playerEntry.discord_player_id, "discordUser"), inline: true },
       { name: '🎲 Mesa', value: game.name, inline: true },
       { name: '🌐 Origem', value: `${origin.origin} (${origin.group_name})`, inline: true },
       { name: '🧙 Vaga de Staff?', value: playerEntry.is_staff_player ? 'Sim' : 'Não', inline: true },

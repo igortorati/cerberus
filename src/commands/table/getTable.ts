@@ -28,8 +28,8 @@ export async function getTable(
     const currentPlayers = await currentPlayerService.getByGame(transaction, gameId)
     const playerFields = currentPlayers.map((entry) => {
       return {
-        name: `Jogador${entry.is_staff ? " (Staff)" : ""}`,
-        value: `<@${entry.discord_player_id}>${entry.is_staff ? " ⭐" : ""}`,
+        name: `Jogador${entry.is_staff_player ? " (Staff)" : ""}`,
+        value: `<@${entry.discord_player_id}>${entry.is_staff_player ? " ⭐" : ""}`,
         inline: false,
       }
     })

@@ -62,7 +62,7 @@ export async function editTable(
 }
 
 function buildUpdateEmbed(
-oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, addedRoleWarning: WarningMessage | undefined, removedRoleWarning: WarningMessage | undefined, currentPlayers: { id: number; game_id: number; discord_player_id: string; is_staff: boolean} []) {
+oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, addedRoleWarning: WarningMessage | undefined, removedRoleWarning: WarningMessage | undefined, currentPlayers: { id: number; game_id: number; discord_player_id: string; is_staff_player: boolean} []) {
   const updatedFields = (Object.entries(FIELD_LABELS) as Array<
     [keyof NewGame, string]
   >)

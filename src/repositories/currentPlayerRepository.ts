@@ -44,7 +44,7 @@ export class CurrentPlayerRepository {
   async updateStaffStatus(transaction: DBTransaction, id: number, isStaff: boolean) {
     await transaction
       .update(currentPlayer)
-      .set({ is_staff: isStaff })
+      .set({ is_staff_player: isStaff })
       .where(eq(currentPlayer.id, id))
   }
 }

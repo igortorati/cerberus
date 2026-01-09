@@ -16,8 +16,6 @@ export async function createTable(
   const gameService = new GameService()
   const discordUserService = new DiscordUserService()
 
-  console.log("Interaction", interaction.data.options)
-
   const newGameData = buildNewGameDataFromCreateGameInteraction(interaction)
   
   await discordUserService.createOrUpdateUser(transaction, newGameData.dm_discord_id, interaction.guild_id, env)

@@ -1,6 +1,6 @@
 import { InteractionResponseType } from 'discord-interactions';
 import { JsonResponse } from '../../utils/jsonResponse';
-import { APIChatInputApplicationCommandInteraction, PermissionFlagsBits } from 'discord-api-types/v10';
+import { APIChatInputApplicationCommandInteraction } from 'discord-api-types/v10';
 import { extractInteractionData } from '../../utils/getInteractionOptions';
 import { EmbedBuilder } from '../../utils/embedBuilder';
 import { Env } from '../../interfaces/envInterface';
@@ -15,7 +15,7 @@ import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFo
 import { WarningMessage } from '../../interfaces/warningInterface';
 import { PlayerEntryInputData } from '../../interfaces/playerEntryInputDataInterface';
 import { NewPlayerEntryLog } from '../../models/playerEntryLogModel';
-import { hasPermission } from '../../utils/hasPermission';
+import { checkMemberIsAdminOrGeneral } from '../../utils/checkMemberIsAdminOrGeneral';
 
 export async function playerExit(
   transaction: DBTransaction,
@@ -25,14 +25,14 @@ export async function playerExit(
   const inputData = extractInteractionData<PlayerEntryInputData>(interaction)
   const newPlayerData = getPlayerEntryFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
 
-  const { game, currentPlayer } = await validateInput(transaction, newPlayerData, interaction);
+  const { game, currentPlayer } = await validateInput(transaction, newPlayerData, interaction, env);
 
   const logService = new PlayerEntryLogService();
   const logId = await logService.createLog(transaction, newPlayerData);
 
-  const warning = await processPlayerExit(transaction, interaction, env, game, newPlayerData, currentPlayer.is_staff);
+  const warning = await processPlayerExit(transaction, interaction, env, game, newPlayerData, currentPlayer.is_staff_player);
 
-  const embed = createEmbed(newPlayerData, game, currentPlayer.is_staff, logId, warning);
+  const embed = createEmbed(newPlayerData, game, currentPlayer.is_staff_player, logId, warning);
 
   return new JsonResponse({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -43,7 +43,7 @@ export async function playerExit(
 function getPlayerEntryFromPlayerEntryInputData(entry: PlayerEntryInputData, id: string): NewPlayerEntryLog {
   return {
     reported_by_discord_id: id,
-    player_discord_id: entry.jogador,
+    discord_player_id: entry.jogador,
     operation: "entry",
     game_id: entry.mesa,
     is_staff_player: entry.vaga_staff,
@@ -54,8 +54,8 @@ function getPlayerEntryFromPlayerEntryInputData(entry: PlayerEntryInputData, id:
   } as NewPlayerEntryLog
 }
 
-async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntryLog, interaction: APIChatInputApplicationCommandInteraction) {
-  if (!exitData.player_discord_id || !exitData.game_id) {
+async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntryLog, interaction: APIChatInputApplicationCommandInteraction, env: Env) {
+  if (!exitData.discord_player_id || !exitData.game_id) {
     throw new CommandError("⚠️ Por favor, informe **jogador** e **mesa**.");
   }
 
@@ -64,13 +64,16 @@ async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntr
 
   const game = await gameService.getGameById(transaction, exitData.game_id);
 
-  if (game.dm_discord_id !== interaction.member?.user.id && hasPermission(interaction.member?.permissions, PermissionFlagsBits.ManageRoles) === false) {
+  const isDm = game.dm_discord_id === interaction.member?.user.id;
+  const isAdminOrGeneral = checkMemberIsAdminOrGeneral(interaction.member, env);
+
+  if (!isDm && !isAdminOrGeneral) {
     throw new CommandError(`❌ Você não é o Mestre da Mesa "${game.name}"!`);
   }
 
-  const currentPlayer = await currentPlayerService.getEntryByTableAndUser(transaction, exitData.player_discord_id, exitData.game_id);
+  const currentPlayer = await currentPlayerService.getEntryByTableAndUser(transaction, exitData.discord_player_id, exitData.game_id);
   if (!currentPlayer) {
-    throw new CommandError(`❌ O jogador <@${exitData.player_discord_id}> não está nesta mesa.`);
+    throw new CommandError(`❌ O jogador <@${exitData.discord_player_id}> não está nesta mesa.`);
   }
 
   return { game, currentPlayer };
@@ -97,9 +100,9 @@ async function processPlayerExit(
 
   if (!interaction.guild_id) throw new CommandError(`❌ Não foi possível encontrar a Guild.`);
 
-  await currentPlayerService.removeByGameAndUser(transaction, exitData.game_id, exitData.player_discord_id);
+  await currentPlayerService.removeByGameAndUser(transaction, exitData.game_id, exitData.discord_player_id);
 
-  const warning = await removeRoleFromUser(interaction.guild_id, game.role_id, exitData.player_discord_id, env.DISCORD_TOKEN);
+  const warning = await removeRoleFromUser(interaction.guild_id, game.role_id, exitData.discord_player_id, env.DISCORD_TOKEN);
 
   return warning;
 }
@@ -112,7 +115,7 @@ function createEmbed(
   warning: WarningMessage
 ) {
   const fields = [
-    { name: '👤 Jogador', value: formatFieldsToDiscordFormat(exitData.player_discord_id, "discordUser"), inline: true },
+    { name: '👤 Jogador', value: formatFieldsToDiscordFormat(exitData.discord_player_id, "discordUser"), inline: true },
     { name: '🎲 Mesa', value: game.name, inline: true },
     { name: '🧙 Vaga de Staff?', value: isStaff ? 'Sim' : 'Não', inline: true },
   ];

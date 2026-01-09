@@ -29,6 +29,7 @@ import { initDB } from '../database/db'
 import { JsonResponse } from '../utils/jsonResponse'
 import { InteractionResponseType } from 'discord-interactions'
 import { CommandError } from '../errors/commandError'
+import { checkMemberIsAdminOrGeneral } from '../utils/checkMemberIsAdminOrGeneral'
 
 export async function handleInteraction(
   interaction: APIInteraction,
@@ -51,14 +52,20 @@ export async function handleInteraction(
             case INVITE_COMMAND.name.toLowerCase():
               return generateInviteUrl(env)
 
-            case CREATE_TABLE_COMMAND.name.toLowerCase():
+            case CREATE_TABLE_COMMAND.name.toLowerCase(): {
+              checkAccessToCommand(interaction, env)
               return await createTable(tx, commandInteraction, env)
+            }
 
-            case EDIT_TABLE_COMMAND.name.toLowerCase():
+            case EDIT_TABLE_COMMAND.name.toLowerCase(): {
+              checkAccessToCommand(interaction, env)
               return await editTable(tx, commandInteraction, env)
+            }
 
-            case DELETE_TABLE_COMMAND.name.toLowerCase():
+            case DELETE_TABLE_COMMAND.name.toLowerCase(): {
+              checkAccessToCommand(interaction, env)
               return await deleteTable(tx, commandInteraction)
+            }
 
             case GET_TABLE_COMMAND.name.toLowerCase():
               return await getTable(tx, commandInteraction)
@@ -100,5 +107,11 @@ export async function handleInteraction(
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: { content: message },
     })
+  }
+}
+
+function checkAccessToCommand(interaction: APIInteraction, env: Env) {
+  if (!checkMemberIsAdminOrGeneral(interaction.member, env)) {
+    throw new CommandError(`❌ Você não é Admin do servidor nem General, não tem acesso a esse comando!`);
   }
 }

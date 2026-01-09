@@ -11,7 +11,7 @@ export const currentPlayer = mysqlTable('current_player', {
   discord_player_id: varchar('discord_player_id', { length: 25 })
     .notNull()
     .references(() => discordUser.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  is_staff: boolean('is_staff').notNull().default(false),
+  is_staff_player: boolean('is_staff_player').notNull().default(false),
 })
 
 export const currentPlayerRelations = relations(currentPlayer, ({ one }) => ({
