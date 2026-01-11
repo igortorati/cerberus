@@ -14,4 +14,6 @@ export const FIELD_LABELS: Record<string, string> = {
   voice_channel_id: '🎧 Canal Voz',
   role_id: '🏷️ Cargo',
   is_one_shot: '📍 É One shot?',
+  is_ongoing: '🚦 Em Andamento?',
+  is_being_promoted: '🎯 Em Divulgação?',
 };

@@ -14,3 +14,4 @@ localConnectionString = "mysql://root:root@localhost:3306/cerberus_test"
 # DISCORD_TOKEN
 # DISCORD_PUBLIC_KEY
 # DISCORD_APPLICATION_ID
+# GENERAL_ROLE_ID

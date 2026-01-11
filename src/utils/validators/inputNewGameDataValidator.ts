@@ -69,8 +69,15 @@ export const inputGameDataValidator = z.object({
 
   one_shot: z
     .boolean()
-    .optional()
-    .default(false),
+    .optional(),
+
+  em_andamento: z
+    .boolean()
+    .optional(),
+
+  em_divulgacao: z
+    .boolean()
+    .optional(),
 })
 
 export type ValidatedNewGameInput = z.infer<typeof inputGameDataValidator>

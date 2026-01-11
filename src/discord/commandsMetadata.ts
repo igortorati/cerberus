@@ -96,6 +96,18 @@ export const CREATE_TABLE_COMMAND = {
       description: 'Marque se esta é uma One shot.',
       required: false,
     },
+    {
+      type: 5,
+      name: 'em_andamento',
+      description: 'Marque se esta está em andamento.',
+      required: false,
+    },
+    {
+      type: 5,
+      name: 'em_divulgacao',
+      description: 'Marque se esta está em divulgação.',
+      required: false,
+    },
   ],
 }
 
@@ -186,6 +198,18 @@ export const EDIT_TABLE_COMMAND = {
       type: 5,
       name: 'one_shot',
       description: 'Marque se esta é uma One shot.',
+      required: false,
+    },
+    {
+      type: 5,
+      name: 'em_andamento',
+      description: 'Marque se esta está em andamento.',
+      required: false,
+    },
+    {
+      type: 5,
+      name: 'em_divulgacao',
+      description: 'Marque se esta está em divulgação.',
       required: false,
     },
   ],

@@ -4,6 +4,7 @@ import { NewGame } from '../models'
 import { extractInteractionData } from './getInteractionOptions'
 import { IEditGameInputData } from '../interfaces/editGameInputDataInterface'
 import { inputEditGameDataValidator, ValidatedEditGameInput } from './validators/inputEditGameDataValidator'
+import { isNull } from './isNull'
 
 export function buildEditGameDataFromCreateGameInteraction(
   interaction: APIChatInputApplicationCommandInteraction
@@ -32,7 +33,9 @@ export function buildEditGameDataFromCreateGameInteraction(
     time: data.horario,
     price: data.valor?.toString(),
     start_date: data.data_primeira_sessao,
-    is_one_shot: data.one_shot
+    is_one_shot: !isNull(data.one_shot) ? data.one_shot : undefined,
+    is_ongoing: !isNull(data.em_andamento) ? data.em_andamento : undefined,
+    is_being_promoted: !isNull(data.em_divulgacao) ? data.em_divulgacao : undefined
   }
 
   return editGameData
