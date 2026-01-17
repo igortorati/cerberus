@@ -54,6 +54,7 @@ export const game = mysqlTable('game', {
   is_one_shot: boolean('is_one_shot').notNull(),
   is_ongoing: boolean('is_ongoing').notNull().default(false),
   is_being_promoted: boolean('is_being_promoted').notNull().default(false),
+  is_ddal: boolean('is_ddal').notNull().default(false),
 })
 
 export const gameRelations = relations(game, ({ one, many }) => ({

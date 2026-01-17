@@ -20,6 +20,7 @@ export function buildNewGameDataFromCreateGameInteraction(
   const data: ValidatedNewGameInput = validated.data
   const createdByUser = interaction.member?.user.id || data.mestre
 
+  const isDdal = !isNull(data.ddal) ? Boolean(data.ddal) : false;
   const newGameData: NewGame = {
     name: data.nome_mesa,
     dm_discord_id: data.mestre,
@@ -39,9 +40,10 @@ export function buildNewGameDataFromCreateGameInteraction(
     is_active: true,
     generate_calendar: true,
     created_by_discord_id: createdByUser ?? null,
-    is_one_shot: !isNull(data.one_shot) ? data.one_shot : false,
+    is_one_shot: isDdal || (!isNull(data.one_shot) ? data.one_shot : false),
     is_ongoing: !isNull(data.em_andamento) ? data.em_andamento : false,
-    is_being_promoted: !isNull(data.em_divulgacao) ? data.em_divulgacao : false
+    is_being_promoted: !isNull(data.em_divulgacao) ? data.em_divulgacao : false,
+    is_ddal: isDdal,
   }
 
   return newGameData
