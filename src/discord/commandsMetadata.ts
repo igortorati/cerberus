@@ -108,6 +108,12 @@ export const CREATE_TABLE_COMMAND = {
       description: 'Marque se esta está em divulgação.',
       required: false,
     },
+    {
+      type: 5,
+      name: 'ddal',
+      description: 'Marque se a mesa é da DDAL (se estiver marcado como true, será consequentemente uma One-shot).',
+      required: false,
+    },
   ],
 }
 
@@ -197,19 +203,25 @@ export const EDIT_TABLE_COMMAND = {
     {
       type: 5,
       name: 'one_shot',
-      description: 'Marque se esta é uma One shot.',
+      description: 'Marque se esta mesa é uma One shot.',
       required: false,
     },
     {
       type: 5,
       name: 'em_andamento',
-      description: 'Marque se esta está em andamento.',
+      description: 'Marque se a mesa está em andamento.',
       required: false,
     },
     {
       type: 5,
       name: 'em_divulgacao',
-      description: 'Marque se esta está em divulgação.',
+      description: 'Marque se a mesa está em divulgação.',
+      required: false,
+    },
+    {
+      type: 5,
+      name: 'ddal',
+      description: 'Marque se a mesa é da DDAL (se estiver marcado como true, será consequentemente uma One-shot).',
       required: false,
     },
   ],
