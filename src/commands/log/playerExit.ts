@@ -23,7 +23,7 @@ export async function playerExit(
   env: Env
 ): Promise<Response> {
   const inputData = extractInteractionData<PlayerEntryInputData>(interaction)
-  const newPlayerData = getPlayerEntryFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
+  const newPlayerData = getPlayerExitFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
 
   const { game, currentPlayer } = await validateInput(transaction, newPlayerData, interaction, env);
 
@@ -40,11 +40,11 @@ export async function playerExit(
   });
 }
 
-function getPlayerEntryFromPlayerEntryInputData(entry: PlayerEntryInputData, id: string): NewPlayerEntryLog {
+function getPlayerExitFromPlayerEntryInputData(entry: PlayerEntryInputData, id: string): NewPlayerEntryLog {
   return {
     reported_by_discord_id: id,
     discord_player_id: entry.jogador,
-    operation: "entry",
+    operation: "exit",
     game_id: entry.mesa,
     is_staff_player: entry.vaga_staff,
     join_from_id: entry.origem_entrada,
