@@ -19,6 +19,7 @@ import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFo
 import { PlayerEntryInputData } from '../../interfaces/playerEntryInputDataInterface';
 import { NewPlayerEntryLog } from '../../models/playerEntryLogModel';
 import { isNull } from '../../utils/isNull';
+import { FIELD_LABELS } from '../../constants/fieldLabelsConstants';
 
 export async function playerEntry(
   transaction: DBTransaction,
@@ -115,10 +116,12 @@ function validateInput(newPlayerEntry: NewPlayerEntryLog, game: Game) {
 
 function createEmbed(warning: WarningMessage, game: Game, origin: JoinOrigin, playerEntry: NewPlayerEntryLog, logId: number) {
   const fields = [
+      { name: FIELD_LABELS.name, value: game.name, inline: true },
+      { name: FIELD_LABELS.day_of_week, value: `${ game.day_of_week} (${game.time})`, inline: true },
+      { name: FIELD_LABELS.dm_discord_id, value: formatFieldsToDiscordFormat(game.dm_discord_id, "discordUser"), inline: true },
       { name: '👤 Jogador', value: formatFieldsToDiscordFormat(playerEntry.discord_player_id, "discordUser"), inline: true },
-      { name: '🎲 Mesa', value: game.name, inline: true },
       { name: '🌐 Origem', value: `${origin.origin} (${origin.group_name})`, inline: true },
-      { name: '🧙 Vaga de Staff?', value: playerEntry.is_staff_player ? 'Sim' : 'Não', inline: true },
+      { name: ':medical_symbol: Vaga de Staff?', value: playerEntry.is_staff_player ? 'Sim' : 'Não', inline: true },
     ]
 
   if (playerEntry.note) {
