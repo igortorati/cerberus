@@ -11,11 +11,14 @@ import { CurrentPlayerService } from '../../services/currentPlayerService';
 import { CommandError } from '../../errors/commandError';
 import { removeRoleFromUser } from '../../utils/removeRoleFromUser';
 import { Game } from '../../models/gameModel';
-import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFormat';
 import { WarningMessage } from '../../interfaces/warningInterface';
 import { PlayerEntryInputData } from '../../interfaces/playerEntryInputDataInterface';
 import { NewPlayerEntryLog } from '../../models/playerEntryLogModel';
 import { checkMemberIsAdminOrGeneral } from '../../utils/checkMemberIsAdminOrGeneral';
+import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString';
+import { PlayerOnTable } from '../../interfaces/playerOnTableInterface';
+import { DiscordUserService } from '../../services/discordUserService';
+import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFormat';
 import { FIELD_LABELS } from '../../constants/fieldLabelsConstants';
 
 export async function playerExit(
@@ -24,16 +27,16 @@ export async function playerExit(
   env: Env
 ): Promise<Response> {
   const inputData = extractInteractionData<PlayerEntryInputData>(interaction)
-  const newPlayerData = getPlayerExitFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
+  const exitData = getPlayerExitFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
 
-  const { game, currentPlayer } = await validateInput(transaction, newPlayerData, interaction, env);
+  const { game, exitingPlayer } = await validateInput(transaction, exitData, interaction, env);
 
   const logService = new PlayerEntryLogService();
-  const logId = await logService.createLog(transaction, newPlayerData);
+  const logId = await logService.createLog(transaction, exitData);
 
-  const warning = await processPlayerExit(transaction, interaction, env, game, newPlayerData, currentPlayer.is_staff_player);
+  const warning = await processPlayerExit(transaction, interaction, env, game, exitData, exitingPlayer.isStaffPlayer);
 
-  const embed = createEmbed(newPlayerData, game, currentPlayer.is_staff_player, logId, warning);
+  const embed = createEmbed(exitData, game, exitingPlayer, logId, warning);
 
   return new JsonResponse({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -71,13 +74,15 @@ async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntr
   if (!isDm && !isAdminOrGeneral) {
     throw new CommandError(`❌ Você não é o Mestre da Mesa "${game.name}"!`);
   }
-
-  const currentPlayer = await currentPlayerService.getEntryByTableAndUser(transaction, exitData.discord_player_id, exitData.game_id);
-  if (!currentPlayer) {
-    throw new CommandError(`❌ O jogador <@${exitData.discord_player_id}> não está nesta mesa.`);
+  
+  const exitingPlayer = await currentPlayerService.getEntryByTableAndUser(transaction, exitData.discord_player_id, exitData.game_id);
+  if (!exitingPlayer) {
+    const discordUserService = new DiscordUserService();
+    const exitingPlayer = await discordUserService.createOrUpdateUser(transaction, exitData.discord_player_id, interaction.guild_id, env);
+    throw new CommandError(`❌ O jogador ${getDiscordMentionAndNickString(exitingPlayer)} não está nesta mesa.`);
   }
 
-  return { game, currentPlayer };
+  return { game, exitingPlayer };
 }
 
 async function processPlayerExit(
@@ -111,7 +116,7 @@ async function processPlayerExit(
 function createEmbed(
   exitData: NewPlayerEntryLog,
   game: Game,
-  isStaff: boolean,
+  exitingPlayer: PlayerOnTable,
   logId: number,
   warning: WarningMessage
 ) {
@@ -119,8 +124,8 @@ function createEmbed(
     { name: FIELD_LABELS.name, value: game.name, inline: true },
     { name: FIELD_LABELS.day_of_week, value: `${ game.day_of_week} (${game.time})`, inline: true },
     { name: FIELD_LABELS.dm_discord_id, value: formatFieldsToDiscordFormat(game.dm_discord_id, "discordUser"), inline: true },
-    { name: '👤 Jogador', value: formatFieldsToDiscordFormat(exitData.discord_player_id, "discordUser"), inline: true },
-    { name: ':medical_symbol: Vaga de Staff?', value: isStaff ? 'Sim' : 'Não', inline: true },
+    { name: '👤 Jogador', value: getDiscordMentionAndNickString(exitingPlayer), inline: true },
+    { name: ':medical_symbol: Vaga de Staff?', value: exitingPlayer.isStaffPlayer ? 'Sim' : 'Não', inline: true },
   ];
 
   if (exitData.note) {
