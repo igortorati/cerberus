@@ -6,6 +6,7 @@ import { EmbedBuilder, tableDataEmbedBuilder } from '../../utils/embedBuilder'
 import { GameService } from '../../services/gameService'
 import { DBTransaction } from '../../types/transactionType'
 import { CurrentPlayerService } from '../../services/currentPlayerService'
+import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString'
 
 export async function getTable(
   transaction: DBTransaction,
@@ -28,8 +29,8 @@ export async function getTable(
     const currentPlayers = await currentPlayerService.getByGame(transaction, gameId)
     const playerFields = currentPlayers.map((entry) => {
       return {
-        name: `Jogador${entry.is_staff_player ? " (Staff)" : ""}`,
-        value: `<@${entry.discord_player_id}>${entry.is_staff_player ? " ⭐" : ""}`,
+        name: `Jogador${entry.isStaffPlayer ? " (Staff)" : ""}`,
+        value: getDiscordMentionAndNickString(entry),
         inline: false,
       }
     })

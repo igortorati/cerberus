@@ -14,6 +14,8 @@ import { addRoleToUser } from '../../utils/addRoleToUser'
 import { CurrentPlayerService } from '../../services/currentPlayerService'
 import { removeRoleFromUser } from '../../utils/removeRoleFromUser'
 import { WarningMessage } from '../../interfaces/warningInterface'
+import { PlayerOnTable } from '../../interfaces/playerOnTableInterface'
+import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString'
 
 export async function editTable(
   transaction: DBTransaction,
@@ -41,8 +43,8 @@ export async function editTable(
   const currentPlayers = await currentPlayerService.getByGame(transaction, updateData.id)
   if (updateData.role_id && oldTable.current_players > 0) {
     for(const player of currentPlayers) {
-      const addedRoleReturn = await addRoleToUser(interaction.guild_id, updateData.role_id, player.discord_player_id, env.DISCORD_TOKEN)
-      const removedRoleReturn = await removeRoleFromUser(interaction.guild_id, oldTable.role_id, player.discord_player_id, env.DISCORD_TOKEN)
+      const addedRoleReturn = await addRoleToUser(interaction.guild_id, updateData.role_id, player.discordUserId, env.DISCORD_TOKEN)
+      const removedRoleReturn = await removeRoleFromUser(interaction.guild_id, oldTable.role_id, player.discordUserId, env.DISCORD_TOKEN)
       if(addedRoleReturn.hasWarning) {
         addedRoleWarning = addedRoleReturn
       }
@@ -62,7 +64,7 @@ export async function editTable(
 }
 
 function buildUpdateEmbed(
-oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, addedRoleWarning: WarningMessage | undefined, removedRoleWarning: WarningMessage | undefined, currentPlayers: { id: number; game_id: number; discord_player_id: string; is_staff_player: boolean} []) {
+oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, addedRoleWarning: WarningMessage | undefined, removedRoleWarning: WarningMessage | undefined, currentPlayers: PlayerOnTable[]) {
   const updatedFields = (Object.entries(FIELD_LABELS) as Array<
     [keyof NewGame, string]
   >)
@@ -94,7 +96,7 @@ oldTable: Partial<NewGame>, updatedTable: Partial<NewGame>, gameId: number, adde
   }
 
   if (oldTable.role_id !== updatedTable.role_id) {
-    const playersString = currentPlayers.map(player => `<@${player.discord_player_id}>`).join(', ')
+    const playersString = currentPlayers.map(player => getDiscordMentionAndNickString(player)).join(', ')
     if (removedRoleWarning && removedRoleWarning.hasWarning && removedRoleWarning.warningMessage) {
       updatedFields.push({ name: '❗❗ Aviso', value: `Falha ao remover a role anterior <@&${oldTable.role_id}> dos jogadores: ${playersString}. **A operação deve ser feita manualmente**.`, inline: false})
     } else {

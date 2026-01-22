@@ -1,11 +1,12 @@
 import { CurrentPlayerRepository } from '../repositories/currentPlayerRepository'
 import { NewCurrentPlayer } from '../models/currentPlayerModel'
 import { DBTransaction } from '../types/transactionType'
+import { PlayerOnTable } from '../interfaces/playerOnTableInterface'
 
 export class CurrentPlayerService {
   private repo = new CurrentPlayerRepository()
 
-  async getByGame(transaction: DBTransaction, gameId: number) {
+  async getByGame(transaction: DBTransaction, gameId: number): Promise<PlayerOnTable[]> {
     return await this.repo.findAllByGameId(transaction, gameId)
   }
 
@@ -13,7 +14,7 @@ export class CurrentPlayerService {
     return await this.repo.findByDiscordUser(transaction, discordId)
   }
 
-  async getEntryByTableAndUser(transaction: DBTransaction, discordId: string, gameId: number) {
+  async getEntryByTableAndUser(transaction: DBTransaction, discordId: string, gameId: number): Promise<PlayerOnTable | undefined> {
     return await this.repo.findByDiscordUserAndTableId(transaction, discordId, gameId)
   }
 

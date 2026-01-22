@@ -4,6 +4,7 @@ import { DBTransaction } from '../types/transactionType'
 import { Env } from '../interfaces/envInterface'
 import { fetchGuildUser } from '../utils/getDiscordUsers'
 import { mapFechedDiscordUserToNewDiscordUser } from '../utils/mapFechedDiscordUserToNewDiscordUser'
+import { PlayerOnTable } from '../interfaces/playerOnTableInterface'
 
 export class DiscordUserService {
   private repo = new DiscordUserRepository()
@@ -24,7 +25,7 @@ export class DiscordUserService {
     await this.repo.update(transaction, discordUser.id, discordUser)
   }
 
-  async createOrUpdateUser(transaction: DBTransaction, discordUserId: string, guildId: string | undefined, env: Env) {
+  async createOrUpdateUser(transaction: DBTransaction, discordUserId: string, guildId: string | undefined, env: Env): Promise<PlayerOnTable> {
     const discordUserService = new DiscordUserService()
     const isDiscordUserOnDB = await discordUserService.checkUserExists(transaction,discordUserId)
     const discordUser = mapFechedDiscordUserToNewDiscordUser(await fetchGuildUser(guildId, discordUserId, env.DISCORD_TOKEN))
@@ -33,5 +34,15 @@ export class DiscordUserService {
     } else {
       await discordUserService.createUser(transaction, discordUser)
     }
+
+    return {
+      id: 0,
+      gameId: 0,
+      isStaffPlayer: false,
+      discordUserId: discordUser.id,
+      username: discordUser.username,
+      globalName: discordUser.global_name,
+      nickname: discordUser.server_nick,
+    } as PlayerOnTable
   }
 }
