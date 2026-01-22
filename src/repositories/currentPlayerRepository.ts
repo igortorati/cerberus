@@ -33,41 +33,34 @@ export class CurrentPlayerRepository {
   }
   
   async findByDiscordUserAndTableId(
-  transaction: DBTransaction,
-  discordId: string,
-  gameId: number,
-): Promise<PlayerOnTable | undefined> {
-  return await transaction.query.currentPlayer.findFirst({
-    where: (currentPlayer, { and, eq }) =>
-      and(
+    transaction: DBTransaction,
+    discordId: string,
+    gameId: number,
+  ): Promise<PlayerOnTable | undefined> {
+    const [result] = await transaction
+      .select({
+        id: currentPlayer.id,
+        gameId: currentPlayer.game_id,
+        isStaffPlayer: currentPlayer.is_staff_player,
+
+        discordUserId: discordUser.id,
+        username: discordUser.username,
+        globalName: discordUser.global_name,
+        nickname: discordUser.server_nick,
+      })
+      .from(currentPlayer)
+      .innerJoin(
+        discordUser,
+        eq(currentPlayer.discord_player_id, discordUser.id),
+      )
+      .where(and(
         eq(currentPlayer.discord_player_id, discordId),
         eq(currentPlayer.game_id, gameId),
-      ),
-    with: {
-      playerUser: {
-        columns: {
-          id: true,
-          username: true,
-          global_name: true,
-          server_nick: true,
-        },
-      },
-    },
-  }).then((result) => {
-    if (!result) return undefined
+      ))
+      .limit(1)
 
-    return {
-      id: result.id,
-      gameId: result.game_id,
-      isStaffPlayer: result.is_staff_player,
-
-      discordUserId: result.playerUser.id,
-      username: result.playerUser.username,
-      globalName: result.playerUser.global_name,
-      nickname: result.playerUser.server_nick,
-    }
-  })
-}
+    return result
+  }
 
 
   async add(transaction: DBTransaction, data: NewCurrentPlayer) {
