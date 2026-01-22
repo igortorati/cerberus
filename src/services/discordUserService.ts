@@ -36,8 +36,8 @@ export class DiscordUserService {
     }
 
     return {
-      id: 0,
-      gameId: 0,
+      id: undefined,
+      gameId: undefined,
       isStaffPlayer: false,
       discordUserId: discordUser.id,
       username: discordUser.username,

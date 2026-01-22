@@ -1,6 +1,6 @@
 export interface PlayerOnTable {
-    id: number;
-    gameId: number;
+    id: number | undefined;
+    gameId: number | undefined;
     isStaffPlayer: boolean;
     discordUserId: string;
     username: string;
