@@ -18,6 +18,8 @@ import { checkMemberIsAdminOrGeneral } from '../../utils/checkMemberIsAdminOrGen
 import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString';
 import { PlayerOnTable } from '../../interfaces/playerOnTableInterface';
 import { DiscordUserService } from '../../services/discordUserService';
+import { formatFieldsToDiscordFormat } from '../../utils/formatFieldsToDiscordFormat';
+import { FIELD_LABELS } from '../../constants/fieldLabelsConstants';
 
 export async function playerExit(
   transaction: DBTransaction,
@@ -119,9 +121,11 @@ function createEmbed(
   warning: WarningMessage
 ) {
   const fields = [
+    { name: FIELD_LABELS.name, value: game.name, inline: true },
+    { name: FIELD_LABELS.day_of_week, value: `${ game.day_of_week} (${game.time})`, inline: true },
+    { name: FIELD_LABELS.dm_discord_id, value: formatFieldsToDiscordFormat(game.dm_discord_id, "discordUser"), inline: true },
     { name: '👤 Jogador', value: getDiscordMentionAndNickString(exitingPlayer), inline: true },
-    { name: '🎲 Mesa', value: game.name, inline: true },
-    { name: '🧙 Vaga de Staff?', value: exitingPlayer.isStaffPlayer ? 'Sim' : 'Não', inline: true },
+    { name: ':medical_symbol: Vaga de Staff?', value: exitingPlayer.isStaffPlayer ? 'Sim' : 'Não', inline: true },
   ];
 
   if (exitData.note) {
