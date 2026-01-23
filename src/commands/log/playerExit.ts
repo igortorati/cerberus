@@ -14,7 +14,7 @@ import { Game } from '../../models/gameModel';
 import { WarningMessage } from '../../interfaces/warningInterface';
 import { PlayerEntryInputData } from '../../interfaces/playerEntryInputDataInterface';
 import { NewPlayerEntryLog } from '../../models/playerEntryLogModel';
-import { checkMemberIsAdminOrGeneral } from '../../utils/checkMemberIsAdminOrGeneral';
+import { checkMemberHasTablePermissions } from '../../utils/checkMemberHasTablePermissions';
 import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString';
 import { PlayerOnTable } from '../../interfaces/playerOnTableInterface';
 import { DiscordUserService } from '../../services/discordUserService';
@@ -69,9 +69,9 @@ async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntr
   const game = await gameService.getGameById(transaction, exitData.game_id);
 
   const isDm = game.dm_discord_id === interaction.member?.user.id;
-  const isAdminOrGeneral = checkMemberIsAdminOrGeneral(interaction.member, env);
+  const hasTablePermissions = checkMemberHasTablePermissions(interaction.member, env);
 
-  if (!isDm && !isAdminOrGeneral) {
+  if (!isDm && !hasTablePermissions) {
     throw new CommandError(`❌ Você não é o Mestre da Mesa "${game.name}"!`);
   }
   
