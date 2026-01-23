@@ -17,6 +17,7 @@ export const EnvSchema = z.object({
   ]),
   
   GENERAL_ROLE_ID: z.string(),
+  GUARDIAN_ROLE_ID: z.string(),
 })
 
 export type Env = z.infer<typeof EnvSchema>
