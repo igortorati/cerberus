@@ -16,14 +16,16 @@ export async function createTable(
   const gameService = new GameService()
   const discordUserService = new DiscordUserService()
 
-  const newGameData = buildNewGameDataFromCreateGameInteraction(interaction)
+  const guildId = interaction.guild_id || env.DEFAULT_GUILD_ID
+  const newGameData = buildNewGameDataFromCreateGameInteraction(interaction, guildId)
   
   await discordUserService.createOrUpdateUser(transaction, newGameData.dm_discord_id, interaction.guild_id, env)
-  if(newGameData.created_by_discord_id && newGameData.created_by_discord_id != newGameData.dm_discord_id) await discordUserService.createOrUpdateUser(transaction, newGameData.created_by_discord_id, interaction.guild_id, env)
+  if(newGameData.created_by_discord_id && newGameData.created_by_discord_id != newGameData.dm_discord_id) 
+    await discordUserService.createOrUpdateUser(transaction, newGameData.created_by_discord_id, interaction.guild_id, env)
 
   const newGameId = await gameService.createGame(transaction, newGameData)
 
-  const createdGame = await gameService.getGameById(transaction, newGameId);
+  const createdGame = await gameService.getGameById(transaction, newGameId, interaction.guild_id);
   const embed = tableDataEmbedBuilder(
     createdGame!,
     `🎲 Nova Mesa Criada!`,

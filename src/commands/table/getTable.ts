@@ -7,6 +7,7 @@ import { GameService } from '../../services/gameService'
 import { DBTransaction } from '../../types/transactionType'
 import { CurrentPlayerService } from '../../services/currentPlayerService'
 import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString'
+import { checkGameGuildAndInteractionGuild } from '../../utils/checkGameGuildAndInteractionGuild'
 
 export async function getTable(
   transaction: DBTransaction,
@@ -17,7 +18,7 @@ export async function getTable(
   const gameService = new GameService()
   const currentPlayerService = new CurrentPlayerService()
 
-  const retrievedGame = await gameService.getGameById(transaction, gameId)
+  const retrievedGame = await gameService.getGameById(transaction, gameId, interaction.guild_id)
 
   let tableEmbed = tableDataEmbedBuilder(
     retrievedGame,

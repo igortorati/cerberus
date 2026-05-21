@@ -3,6 +3,7 @@ import { Game, NewGame } from '../models/gameModel'
 import { DBTransaction } from '../types/transactionType'
 import { CommandError } from '../errors/commandError'
 import { ERROR_TABLE_NOT_FOUND } from '../constants/errorMessages'
+import { checkGameGuildAndInteractionGuild } from '../utils/checkGameGuildAndInteractionGuild'
 
 export class GameService {
   private repo = new GameRepository()
@@ -11,14 +12,15 @@ export class GameService {
     return await this.repo.create(transaction, data)
   }
 
-  async getGameById(transaction: DBTransaction, id: number): Promise<Game> {
+  async getGameById(transaction: DBTransaction, id: number, interactionGuildId?: string): Promise<Game> {
     const game = await this.repo.findById(transaction, id)
     if (!game || !game.is_active) throw new CommandError(ERROR_TABLE_NOT_FOUND);
+    checkGameGuildAndInteractionGuild(game.guild_id, interactionGuildId)
     return game
   }
 
-  async getTableBySearch(transaction: DBTransaction, search: string): Promise<{ name: string; value: string }[]> {
-    return await this.repo.findTableBySearch(transaction, search)
+  async getTableBySearch(transaction: DBTransaction, search: string, guildId: string | undefined): Promise<{ name: string; value: string }[]> {
+    return await this.repo.findTableBySearch(transaction, search, guildId)
   }
 
   async updateGame(transaction: DBTransaction, id: number, data: Partial<NewGame>) {

@@ -28,6 +28,8 @@ export async function tableDataAutocomplete(
 
   let choices: Array<{ name: string; value: string }> = []
 
+  const guildId = interaction.guild_id || undefined
+
   switch (focusedOption?.name) {
     case DAYS_OF_WEEK_OPTION_NAME:
       choices = daysOfWeekOptions(valueToSearch)
@@ -38,7 +40,7 @@ export async function tableDataAutocomplete(
       break
 
     case TABLE_OPTION_NAME:
-      choices = await getTablesOptions(transaction, valueToSearch)
+      choices = await getTablesOptions(transaction, valueToSearch, guildId)
       break
 
     case ORIGIN_OPTION_NAME:

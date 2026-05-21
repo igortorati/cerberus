@@ -16,6 +16,7 @@ import { removeRoleFromUser } from '../../utils/removeRoleFromUser'
 import { WarningMessage } from '../../interfaces/warningInterface'
 import { PlayerOnTable } from '../../interfaces/playerOnTableInterface'
 import { getDiscordMentionAndNickString } from '../../utils/getDiscordMentionAndNickString'
+import { checkGameGuildAndInteractionGuild } from '../../utils/checkGameGuildAndInteractionGuild'
 
 export async function editTable(
   transaction: DBTransaction,
@@ -37,7 +38,7 @@ export async function editTable(
       env
     )
 
-  const oldTable = await gameService.getGameById(transaction, updateData.id)
+  const oldTable = await gameService.getGameById(transaction, updateData.id, interaction.guild_id)
   await gameService.updateGame(transaction, updateData.id, updateData)
   
   const currentPlayers = await currentPlayerService.getByGame(transaction, updateData.id)
@@ -54,7 +55,7 @@ export async function editTable(
     }
   }
 
-  const updatedTable = await gameService.getGameById(transaction, updateData.id)
+  const updatedTable = await gameService.getGameById(transaction, updateData.id, interaction.guild_id)
 
   const embed = buildUpdateEmbed(oldTable, updatedTable, updateData.id, addedRoleWarning, removedRoleWarning, currentPlayers)
   return new JsonResponse({

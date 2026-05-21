@@ -23,10 +23,8 @@ export class GameRepository {
     return row
   }
 
-  async findTableBySearch(
-    transaction: DBTransaction,
-    search?: string
-  ): Promise<{ name: string; value: string }[]> {
+  async findTableBySearch(transaction: DBTransaction, search?: string, guildId?: string ):
+    Promise<{ name: string; value: string }[]> {
 
     const searchTerm = search?.trim().toLowerCase() || ''
 
@@ -132,10 +130,15 @@ export class GameRepository {
         ')'
       )
     `
+    let condition = sql`${game.guild_id} = ${guildId}`
 
-    let condition
-    if (searchTerm !== '') {
-      condition = sql`LOWER(${searchString}) LIKE ${'%' + searchTerm + '%'}`
+    if (searchTerm?.trim()) {
+      condition = sql`
+        (
+          ${condition}
+          AND LOWER(${searchString}) LIKE ${`%${searchTerm}%`}
+        )
+      `
     }
 
     const results = await transaction

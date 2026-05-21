@@ -7,7 +7,8 @@ import { INewGameInputData } from '../interfaces/newGameInputDataInterface'
 import { extractInteractionData } from './getInteractionOptions'
 
 export function buildNewGameDataFromCreateGameInteraction(
-  interaction: APIChatInputApplicationCommandInteraction
+  interaction: APIChatInputApplicationCommandInteraction,
+  guildId: string
 ): NewGame {
   const inputValues = extractInteractionData<INewGameInputData>(interaction)
   const validated = inputGameDataValidator.safeParse(inputValues)
@@ -44,6 +45,7 @@ export function buildNewGameDataFromCreateGameInteraction(
     is_ongoing: !isNull(data.em_andamento) ? data.em_andamento : false,
     is_being_promoted: !isNull(data.em_divulgacao) ? data.em_divulgacao : false,
     is_ddal: isDdal,
+    guild_id: guildId,
   }
 
   return newGameData

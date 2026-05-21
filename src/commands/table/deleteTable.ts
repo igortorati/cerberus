@@ -5,6 +5,7 @@ import { EmbedBuilder } from '../../utils/embedBuilder'
 import { GameService } from '../../services/gameService'
 import { DBTransaction } from '../../types/transactionType'
 import { extractInteractionData } from '../../utils/getInteractionOptions'
+import { checkGameGuildAndInteractionGuild } from '../../utils/checkGameGuildAndInteractionGuild'
 
 export async function deleteTable(
   transaction: DBTransaction,
@@ -14,7 +15,8 @@ export async function deleteTable(
   const gameId = inputData.mesa
   const gameService = new GameService()
 
-  const game = await gameService.getGameById(transaction, gameId)
+  const game = await gameService.getGameById(transaction, gameId, interaction.guild_id)
+
   await gameService.deleteGame(transaction, gameId)
 
   const embed = EmbedBuilder({
