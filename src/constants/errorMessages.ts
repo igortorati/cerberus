@@ -27,3 +27,6 @@ export const INVALID_FREQUENCY = `Frequência da mesa é obrigatória e deve seg
 export const INVALID_DAY_OF_WEEK = `Dia da semana é obrigatório e deve seguir o formato adequado (${Object.values(DAY_OF_WEEK).join(", ")}).`
 export const INVALID_PRICE_NEGATIVE = 'O valor não pode ser negativo.'
 export const INVALID_COMMAND_EXECUTOR_ID = 'ID do criador inválido.'
+
+export const GUILD_ID_NOT_FOUND_IN_INTERACTION = 'Identificador de guilda não encotrado na interação.'
+export const GUILD_ID_NOT_THE_SAME_AS_INTERACTION_GUILD_ID = 'Essa mesa não pode ser utilizada neste servidor.'

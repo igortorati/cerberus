@@ -35,7 +35,7 @@ export async function playerEntry(
   
   const newPlayerEntry = getPlayerEntryFromPlayerEntryInputData(inputData, interaction.member?.user?.id || env.DISCORD_APPLICATION_ID)
 
-  const game = await gameService.getGameById(transaction, newPlayerEntry.game_id);
+  const game = await gameService.getGameById(transaction, newPlayerEntry.game_id, interaction.guild_id);
 
   validateInput(newPlayerEntry, game)
   const origin = await originService.getOriginById(transaction, newPlayerEntry.join_from_id!);

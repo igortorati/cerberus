@@ -55,6 +55,8 @@ export const game = mysqlTable('game', {
   is_ongoing: boolean('is_ongoing').notNull().default(false),
   is_being_promoted: boolean('is_being_promoted').notNull().default(false),
   is_ddal: boolean('is_ddal').notNull().default(false),
+
+  guild_id: varchar('guild_id', { length: 25 }).notNull(),
 })
 
 export const gameRelations = relations(game, ({ one, many }) => ({

@@ -66,7 +66,7 @@ async function validateInput(transaction: DBTransaction, exitData: NewPlayerEntr
   const gameService = new GameService();
   const currentPlayerService = new CurrentPlayerService();
 
-  const game = await gameService.getGameById(transaction, exitData.game_id);
+  const game = await gameService.getGameById(transaction, exitData.game_id, interaction.guild_id);
 
   const isDm = game.dm_discord_id === interaction.member?.user.id;
   const hasTablePermissions = checkMemberHasTablePermissions(interaction.member, env);
