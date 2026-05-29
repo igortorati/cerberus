@@ -1,11 +1,18 @@
 import { APIInteractionGuildMember, PermissionFlagsBits } from "discord-api-types/v10";
 import { Env } from "../interfaces/envInterface";
-import { isNull } from "./isNull";
 
 export function checkMemberHasTablePermissions(member: APIInteractionGuildMember | undefined, env : Env) {
   const isAdmin = hasPermission(member?.permissions, PermissionFlagsBits.Administrator);
-  const hasGeneralRole = !isNull(env.GENERAL_ROLE_ID) && member?.roles.includes(env.GENERAL_ROLE_ID);
-  const hasGuardianRole = !isNull(env.GUARDIAN_ROLE_ID) && member?.roles.includes(env.GUARDIAN_ROLE_ID);
+  const generalRoleIds = env.GENERAL_ROLE_IDS?.split(',') ?? []
+  const guardianRoleIds = env.GUARDIAN_ROLE_IDS?.split(',') ?? []
+
+  const hasGeneralRole = generalRoleIds.some(roleId =>
+    member?.roles.includes(roleId)
+  )
+
+  const hasGuardianRole = guardianRoleIds.some(roleId =>
+    member?.roles.includes(roleId)
+  )
 
   return hasGeneralRole || hasGuardianRole || isAdmin;
 }

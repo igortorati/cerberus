@@ -1,17 +1,28 @@
-name = "cerberus"
 main = "./src/server.ts"
 compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2025-02-04"
 [observability.logs]
 enabled = true
 
-[[hyperdrive]]
+[env.prod]
+name = "cerberus"
+[env.prod.vars]
+GENERAL_ROLE_IDS = "1349102673303175331,1489967285799092355"
+GUARDIAN_ROLE_IDS = "1364646008893739118"
+DEFAULT_GUILD_ID = "1258189767720304672"
+[[env.prod.hyperdrive]]
 binding = "HYPERDRIVE"
 id = "8a5bcbd071d448d2b007fdf0f21b8cbe"
 localConnectionString = "mysql://root:root@localhost:3306/cerberus_test"
 
-# [secrets]
-# DISCORD_TOKEN
-# DISCORD_PUBLIC_KEY
-# DISCORD_APPLICATION_ID
-# GENERAL_ROLE_ID
+[env.dev]
+name = "cerberus-dev"
+[env.dev.vars]
+GENERAL_ROLE_IDS = "1349102673303175331,1489967285799092355,1507053944696864898"
+GUARDIAN_ROLE_IDS = "1507053832792838164"
+DEFAULT_GUILD_ID = "1363202651633750239"
+[[env.dev.hyperdrive]]
+binding = "HYPERDRIVE"
+id = "5fc698338cfb485692b468d7bd602819"
+localConnectionString = "mysql://root:root@localhost:3306/cerberus_test"
+
