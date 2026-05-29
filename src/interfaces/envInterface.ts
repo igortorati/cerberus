@@ -16,8 +16,8 @@ export const EnvSchema = z.object({
     z.any(),
   ]),
   
-  GENERAL_ROLE_ID: z.string(),
-  GUARDIAN_ROLE_ID: z.string(),
+  GENERAL_ROLE_IDS: z.string(),
+  GUARDIAN_ROLE_IDS: z.string(),
   DEFAULT_GUILD_ID: z.string(),
 })
 

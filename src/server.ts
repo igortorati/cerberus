@@ -2,7 +2,7 @@ import { AutoRouter } from 'itty-router'
 import { APIInteraction } from 'discord-api-types/v10'
 import { validateRequest } from './utils/validators/validateRequest'
 import { handleInteraction } from './handler/handlers'
-import { Env } from './interfaces/envInterface'
+import { Env, EnvSchema } from './interfaces/envInterface'
 
 const router = AutoRouter()
 
@@ -24,7 +24,16 @@ router.all('*', () => new Response('Not Found.', { status: 404 }))
 
 const server = {
   validateRequest,
-  fetch: router.fetch,
+
+  async fetch(
+    request: Request,
+    rawEnv: unknown,
+    ctx: ExecutionContext,
+  ) {
+    const env = EnvSchema.parse(rawEnv)
+
+    return router.fetch(request, env, ctx)
+  }
 }
 
 export default server
