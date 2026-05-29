@@ -5,10 +5,10 @@
   "private": true,
   "main": "src/config/server.ts",
   "scripts": {
-    "start": "wrangler dev",
+    "start": "wrangler dev --env dev",
     "ngrok": "ngrok http 8787 --config ./ngrok.yaml",
     "register": "tsx src/discord/registerCommands.ts",
-    "publish": "wrangler deploy"
+    "publish": "wrangler deploy --env dev"
   },
   "keywords": [],
   "author": "Igor H. Torati Ruy",
@@ -24,7 +24,7 @@
     "mysql2": "^3.22.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260521.0",
+    "@cloudflare/workers-types": "^4.20260528.1",
     "@eslint/js": "^9.39.4",
     "dotenv": "^16.0.3",
     "drizzle-kit": "^0.18.1",
