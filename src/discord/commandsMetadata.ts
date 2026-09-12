@@ -238,6 +238,12 @@ export const DELETE_TABLE_COMMAND = {
       autocomplete: true,
       required: true,
     },
+    {
+      type: 5,
+      name: 'mesa_terminada',
+      description: 'Marque se a mesa foi terminada.',
+      required: false,
+    },
   ],
 }
 

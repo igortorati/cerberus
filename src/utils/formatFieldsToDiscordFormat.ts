@@ -31,6 +31,7 @@ export function formatFieldsToDiscordFormat(
     case 'is_ongoing':
     case 'is_being_promoted':
     case 'is_ddal':
+    case 'finished':
       return val ? "Sim" : "Não" 
 
     case 'max_players':
