@@ -44,6 +44,7 @@ export const game = mysqlTable('game', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
 
   start_date: date('start_date'),
+  finished: boolean('finished').notNull().default(false),
   closed_date: date('closed_date'),
 
   is_active: boolean('is_active').default(true),

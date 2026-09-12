@@ -11,16 +11,18 @@ export async function deleteTable(
   transaction: DBTransaction,
   interaction: APIChatInputApplicationCommandInteraction
 ): Promise<Response> {
-  const inputData = extractInteractionData<{ mesa: number }>(interaction)
+  const inputData = extractInteractionData<{ mesa: number; mesa_terminada?: boolean }>(interaction)
   const gameId = inputData.mesa
+  const mesaTerminada = Boolean(inputData.mesa_terminada)
   const gameService = new GameService()
 
   const game = await gameService.getGameById(transaction, gameId, interaction.guild_id)
 
+  await gameService.updateGame(transaction, gameId, { finished: mesaTerminada })
   await gameService.deleteGame(transaction, gameId)
 
   const embed = EmbedBuilder({
-    title: `🗑 Mesa "${game.name}" Deletada!`,
+    title: `🗑 Mesa "${game.name}" ${mesaTerminada ? 'Finalizada' : 'Deletada'}!`,
     footer: { text: `🆔 ID da Mesa: ${gameId}` },
   })
   return new JsonResponse({
