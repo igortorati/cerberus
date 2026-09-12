@@ -241,7 +241,7 @@ export const DELETE_TABLE_COMMAND = {
     {
       type: 5,
       name: 'mesa_terminada',
-      description: 'Marque se a mesa foi terminada.',
+      description: 'A mesa foi finalizada?',
       required: false,
     },
   ],
