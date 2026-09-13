@@ -25,6 +25,7 @@ export async function deleteTable(
     title: `🗑 Mesa "${game.name}" ${mesaTerminada ? 'Finalizada' : 'Deletada'}!`,
     footer: { text: `🆔 ID da Mesa: ${gameId}` },
   })
+  
   return new JsonResponse({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: { embeds: [embed] },
