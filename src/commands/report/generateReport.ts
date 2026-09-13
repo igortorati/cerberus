@@ -52,6 +52,7 @@ export async function generateReport(
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         content: messageContent,
+        flags: 64,
       },
     },
     {
