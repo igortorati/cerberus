@@ -9,6 +9,7 @@ import {
   CREATE_JOIN_ORIGIN_COMMAND,
   PLAYER_ENTRY_COMMAND,
   PLAYER_LEAVE_COMMAND,
+  GENERATE_REPORT_COMMAND,
 } from './commandsMetadata'
 
 /**
@@ -48,6 +49,7 @@ const commands: DiscordCommand[] = [
   CREATE_JOIN_ORIGIN_COMMAND,
   PLAYER_ENTRY_COMMAND,
   PLAYER_LEAVE_COMMAND,
+  GENERATE_REPORT_COMMAND,
 ]
 
 ;(async () => {

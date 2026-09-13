@@ -351,3 +351,8 @@ export const PLAYER_LEAVE_COMMAND = {
     },
   ],
 };
+
+export const GENERATE_REPORT_COMMAND = {
+  name: 'gerar-relatorio',
+  description: 'Gera o relatório consolidado de mesas e salva no banco (apenas administradores).',
+}
