@@ -17,7 +17,7 @@ export function checkMemberHasTablePermissions(member: APIInteractionGuildMember
   return hasGeneralRole || hasGuardianRole || isAdmin;
 }
 
-function hasPermission(
+export function hasPermission(
   permissions: string | bigint | null | undefined,
   flag: bigint
 ): boolean {

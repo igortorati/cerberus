@@ -13,6 +13,7 @@ import {
   CREATE_JOIN_ORIGIN_COMMAND,
   PLAYER_ENTRY_COMMAND,
   PLAYER_LEAVE_COMMAND,
+  GENERATE_REPORT_COMMAND,
 } from '../discord/commandsMetadata'
 import type { Env } from '../interfaces/envInterface'
 import { createTable } from '../commands/table/createTable'
@@ -25,6 +26,7 @@ import { getTable } from '../commands/table/getTable'
 import { createJoinOrigin } from '../commands/joinOrigin/joinOrigin'
 import { playerEntry } from '../commands/log/playerEntry'
 import { playerExit } from '../commands/log/playerExit'
+import { generateReport } from '../commands/report/generateReport'
 import { initDB } from '../database/db'
 import { JsonResponse } from '../utils/jsonResponse'
 import { InteractionResponseType } from 'discord-interactions'
@@ -74,6 +76,9 @@ export async function handleInteraction(
 
             case PLAYER_LEAVE_COMMAND.name.toLowerCase():
               return await playerExit(tx, commandInteraction, env)
+
+            case GENERATE_REPORT_COMMAND.name.toLowerCase():
+              return await generateReport(tx, commandInteraction, env)
 
             default:
               throw new CommandError('Comando desconhecido.')
